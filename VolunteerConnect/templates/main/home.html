@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Home</title>
+</head>
+<body>
+
+    <nav>
+        {% if user.is_authenticated %}
+            <p>Welcome, {{ user.username }}!</p>
+            <a href="http://127.0.0.1:8000/logout">Logout</a>
+        {% else %}
+            <a href="http://127.0.0.1:8000/accounts/login/">Login</a>
+            <a href="http://127.0.0.1:8000/register/">Register</a>
+        {% endif %}
+    </nav>
+
+    <h1>Welcome to the Home Page!</h1>
+    <p>This is your home page. Customize it as you like.</p>
+    {% if user.is_authenticated %}
+        <p>Welcome back, {{ user.username }}!</p>
+    {% else %}
+        <p><a href="http://127.0.0.1:8000/accounts/login/">Login</a> or <a href="http://127.0.0.1:8000/register/">Register</a></p>
+    {% endif %}
+</body>
+</html>

@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Login</title>
+</head>
+<body>
+    <h1>Login</h1>
+    {% if form.errors %}
+        <p>There were errors in your form:</p>
+        {{ form.errors }}
+    {% endif %}
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Login</button>
+    </form>
+    <p>Don't have an account? <a href="http://127.0.0.1:8000/register/">Register here</a>.</p>
+</body>
+</html>
