@@ -7,12 +7,12 @@ from django.contrib.auth import logout
 def home(request):
     return render(request, 'main/home.html')
 
-
+# Funkcija za odjavu
 def custom_logout(request):
-    logout(request)  # Django funkcija za odjavu
+    logout(request) 
     return redirect('http://127.0.0.1:8000/home/')
 
-
+# Funkcija za registraciju
 def register(request):
     if request.method == 'POST':
         form = CustomUserCreationForm(request.POST)
@@ -25,9 +25,9 @@ def register(request):
 
             user.set_password(form.cleaned_data['password'])
             user.save()
-            # Automatski prijavi korisnika nakon registracije
+
             login(request, user)
-            return redirect('http://127.0.0.1:8000/home/')  # Zamijenite 'home' s nazivom vaše početne stranice
+            return redirect('http://127.0.0.1:8000/home/')
     else:
         form = CustomUserCreationForm()
     return render(request, 'registration/register.html', {'form': form})

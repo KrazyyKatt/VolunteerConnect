@@ -9,7 +9,7 @@ class CustomUserAdmin(UserAdmin):
     list_display = ['username', 'email', 'is_staff', 'is_superuser']
 
     def save_model(self, request, obj, form, change):
-        if not change:  # Ako kreiramo novog korisnika
+        if not change:
             obj.is_staff = False
             obj.is_superuser = False
         super().save_model(request, obj, form, change)

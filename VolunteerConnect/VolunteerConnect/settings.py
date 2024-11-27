@@ -47,6 +47,8 @@ LOGOUT_REDIRECT_URL = 'http://127.0.0.1:8000/home/'
 
 LOGIN_REDIRECT_URL = 'http://127.0.0.1:8000/home/'
 
+
+
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
