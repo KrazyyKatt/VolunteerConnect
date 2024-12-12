@@ -4,6 +4,9 @@ from .models import *
 
 # Register your models here.
 
+#user: admin
+#pass: admin1234
+
 class CustomUserAdmin(UserAdmin):
     model = CustomUser
     list_display = ['username', 'email', 'is_staff', 'is_superuser']
