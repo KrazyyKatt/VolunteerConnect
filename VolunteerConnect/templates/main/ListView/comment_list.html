@@ -1,0 +1,17 @@
+<h1>Popis Komentara</h1>
+<form method="get">
+    <input type="text" name="author" placeholder="Autor komentara" value="{{ request.GET.author }}">
+    <button type="submit">Filtriraj</button>
+
+    <br><br>
+
+    <input type="text" name="q" placeholder="Pretraži komentare..." value="{{ request.GET.q }}">
+    <button type="submit">Pretraži</button>
+</form>
+<ul>
+    {% for comment in comments %}
+        <li>{{ comment.author.username }} - {{ comment.content }}</li>
+    {% empty %}
+        <li>Nema komentara.</li>
+    {% endfor %}
+</ul>

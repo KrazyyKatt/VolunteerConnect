@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detalji Sudjelovanja</title>
+</head>
+<body>
+    <h1>Detalji Sudjelovanja</h1>
+    <p><strong>ID Sudjelovanja:</strong> {{ participation.id }}</p>
+    <p><strong>Sudionik:</strong> {{ participation.participant.username }}</p>
+    <p><strong>Datum Prijave:</strong> {{ participation.date_joined|date:"Y-m-d H:i" }}</p>
+
+    <hr>
+    <!-- Povezani događaj -->
+    <h2>Događaj</h2>
+    <p><strong>Naslov:</strong> <a href="{% url 'main:event_detail' participation.event.pk %}">{{ participation.event.title }}</a></p>
+    <p><strong>Lokacija:</strong> {{ participation.event.location }}</p>
+    <p><strong>Datum:</strong> {{ participation.event.date }}</p>
+
+    <hr>
+    <a href="{% url 'main:participation_list' %}">Povratak na popis sudjelovanja</a>
+</body>
+</html>

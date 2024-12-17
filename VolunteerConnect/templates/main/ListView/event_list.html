@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Event List</title>
+</head>
+<body>
+    <h1>Popis Događaja</h1>
+
+    <!-- Forma za filtriranje -->
+    <form method="get" action="">
+
+        <label for="date">Datum kreiranja:</label>
+        <input type="date" name="date" value="{{ request.GET.date }}">
+
+        <button type="submit">Filtriraj</button>
+
+        <br><br>
+
+        <input type="text" name="q" placeholder="Pretraži događaje..." value="{{ request.GET.q }}">
+        <button type="submit">Pretraži</button>
+    </form>
+
+    <hr>
+
+    <!-- Prikaz rezultata -->
+    <ul>
+        {% for event in events %}
+            <li>
+                <strong>{{ event.title }}</strong> - {{ event.description }}<br>
+                Kategorija: {{ event.category }} | Datum: {{ event.created_at|date:"Y-m-d" }}
+            </li>
+        {% empty %}
+            <li>Nema događaja za prikaz.</li>
+        {% endfor %}
+    </ul>
+</body>
+</html>

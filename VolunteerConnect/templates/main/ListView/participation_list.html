@@ -1,0 +1,17 @@
+<h1>Popis Sudjelovanja</h1>
+<form method="get">
+    <input type="text" name="user" placeholder="Korisnik" value="{{ request.GET.user }}">
+    <button type="submit">Filtriraj</button>
+
+    <br><br>
+
+    <input type="text" name="q" placeholder="Pretraži sudionike ili događaje..." value="{{ request.GET.q }}">
+    <button type="submit">Pretraži</button>
+</form>
+<ul>
+    {% for participation in participations %}
+        <li>{{ participation.participant.username }} - {{ participation.event.title }}</li>
+    {% empty %}
+        <li>Nema sudjelovanja.</li>
+    {% endfor %}
+</ul>

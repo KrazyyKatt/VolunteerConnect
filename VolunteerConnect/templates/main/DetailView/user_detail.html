@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detalji Korisnika</title>
+</head>
+<body>
+    <h1>Detalji Korisnika</h1>
+    <p><strong>ID:</strong> {{ user.id }}</p>
+    <p><strong>Korisničko ime:</strong> {{ user.username }}</p>
+    <p><strong>Email:</strong> {{ user.email }}</p>
+    <p><strong>Telefon:</strong> {{ user.phone_number }}</p>
+    <p><strong>Adresa:</strong> {{ user.address }}</p>
+
+    <hr>
+    <!-- Organizirani događaji -->
+    <h2>Događaji koje je korisnik organizirao</h2>
+    {% if organized_events %}
+        <ul>
+            {% for event in organized_events %}
+                <li><a href="{% url 'main:event_detail' event.pk %}">{{ event.title }}</a> ({{ event.date|date:"Y-m-d" }})</li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>Korisnik nije organizirao nijedan događaj.</p>
+    {% endif %}
+
+    <hr>
+    <!-- Sudjelovanja -->
+    <h2>Događaji na kojima korisnik sudjeluje</h2>
+    {% if participations %}
+        <ul>
+            {% for participation in participations %}
+                <li><a href="{% url 'main:event_detail' participation.event.pk %}">{{ participation.event.title }}</a></li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>Korisnik ne sudjeluje ni na jednom događaju.</p>
+    {% endif %}
+
+    <hr>
+    <a href="{% url 'main:user_list' %}">Povratak na popis korisnika</a>
+</body>
+</html>

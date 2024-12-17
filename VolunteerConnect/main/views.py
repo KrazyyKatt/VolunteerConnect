@@ -72,5 +72,216 @@ def register(request):
     return render(request, 'registration/register.html', {'form': form})
 
 
+# Generički pogledi ListView
+from django.views.generic import ListView
+from .models import *
+
+class EventListView(ListView):
+    model = Event
+    template_name = 'main/ListView/event_list.html'
+    context_object_name = 'events'
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        search_query = self.request.GET.get('q') 
+        date_query = self.request.GET.get('date') 
+
+        if search_query:
+            queryset = queryset.filter(
+                models.Q(title__icontains=search_query) | models.Q(description__icontains=search_query)
+            )
+        if date_query:
+            queryset = queryset.filter(date__date=date_query)
+
+        return queryset
+    
+class ParticipationListView(ListView):
+    model = Participation
+    template_name = 'main/ListView/participation_list.html'
+    context_object_name = 'participations'
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        user = self.request.GET.get('user')
+        
+        if user:
+            queryset = queryset.filter(participant__username=user)
+        
+        
+        search_query = self.request.GET.get('q')
+        if search_query:
+            queryset = queryset.filter(
+                models.Q(event__title__icontains=search_query) | models.Q(participant__username__icontains=search_query)
+            )
+
+        return queryset
 
 
+class CommentListView(ListView):
+    model = Comment
+    template_name = 'main/ListView/comment_list.html'
+    context_object_name = 'comments'
+        
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        author = self.request.GET.get('author')
+
+        if author:
+            queryset = queryset.filter(author__username__icontains=author)
+
+
+        search_query = self.request.GET.get('q')
+        if search_query:
+            queryset = queryset.filter(
+                models.Q(content__icontains=search_query) | models.Q(author__username__icontains=search_query)
+            )
+
+        return queryset
+
+
+class AttachmentListView(ListView):
+    model = Attachment
+    template_name = 'main/ListView/attachment_list.html'
+    context_object_name = 'attachments'
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        filename = self.request.GET.get('filename')
+
+        if filename:
+            queryset = queryset.filter(file__icontains=filename)
+    
+        search_query = self.request.GET.get('q')
+        if search_query:
+            queryset = queryset.filter(
+                models.Q(file__icontains=search_query) | models.Q(event__title__icontains=search_query)
+            )
+
+        return queryset
+    
+
+class UserListView(ListView):
+    model = CustomUser
+    template_name = 'main/ListView/user_list.html' 
+    context_object_name = 'users' 
+
+    def get_queryset(self):
+        """
+        Filtriranje korisnika prema GET parametrima (username, email, phone_number).
+        """
+        queryset = super().get_queryset()
+        username = self.request.GET.get('username')
+        email = self.request.GET.get('email') 
+        phone = self.request.GET.get('phone')
+
+        if username:
+            queryset = queryset.filter(username__icontains=username)
+        if email:
+            queryset = queryset.filter(email__icontains=email)
+        if phone:
+            queryset = queryset.filter(phone_number__icontains=phone)
+
+        search_query = self.request.GET.get('q')
+        if search_query:
+            queryset = queryset.filter(
+                models.Q(username__icontains=search_query) | models.Q(email__icontains=search_query)
+            )
+
+        return queryset
+
+    
+# Generički pogledi DetailView
+from django.views.generic import DetailView
+from .models import *
+
+class EventDetailView(DetailView):
+    model = Event
+    template_name = 'main/DetailView/event_detail.html' 
+    context_object_name = 'event' 
+
+    def get_context_data(self, **kwargs):
+        """
+        Dodavanje relacija u kontekst predloška (npr. komentari, sudjelovanja, prilozi).
+        """
+        context = super().get_context_data(**kwargs)
+        event = self.get_object() 
+
+        # Dodavanje relacija
+        context['comments'] = event.comments.all() 
+        context['participants'] = event.participants.all() 
+        context['attachments'] = event.attachments.all() 
+
+        return context
+    
+
+class CommentDetailView(DetailView):
+    model = Comment
+    template_name = 'main/DetailView/comment_detail.html'
+    context_object_name = 'comment'
+
+    def get_context_data(self, **kwargs):
+        """
+        Dodavanje relacija u kontekst predloška.
+        """
+        context = super().get_context_data(**kwargs)
+        comment = self.get_object()
+
+        # Dodavanje relacija
+        context['event'] = comment.event  
+        context['author'] = comment.author 
+
+        return context
+    
+class ParticipationDetailView(DetailView):
+    model = Participation
+    template_name = 'main/DetailView/participation_detail.html'
+    context_object_name = 'participation'
+
+    def get_context_data(self, **kwargs):
+        """
+        Dodavanje relacija u kontekst predloška.
+        """
+        context = super().get_context_data(**kwargs)
+        participation = self.get_object()
+
+        # Dodavanje relacija
+        context['event'] = participation.event  
+        context['participant'] = participation.participant 
+
+        return context
+    
+class AttachmentDetailView(DetailView):
+    model = Attachment
+    template_name = 'main/DetailView/attachment_detail.html'
+    context_object_name = 'attachment'
+
+    def get_context_data(self, **kwargs):
+        """
+        Dodavanje relacija u kontekst predloška.
+        """
+        context = super().get_context_data(**kwargs)
+        attachment = self.get_object()
+
+        # Dodavanje relacija
+        context['event'] = attachment.event 
+
+        return context
+    
+class UserDetailView(DetailView):
+    model = CustomUser
+    template_name = 'main/DetailView/user_detail.html'
+    context_object_name = 'user'
+
+    def get_context_data(self, **kwargs):
+        """
+        Dodavanje relacija u kontekst predloška.
+        """
+        context = super().get_context_data(**kwargs)
+        user = self.get_object()
+
+        # Dodavanje relacija
+        context['organized_events'] = user.event_set.all() 
+        context['participations'] = user.participations.all() 
+
+        return context

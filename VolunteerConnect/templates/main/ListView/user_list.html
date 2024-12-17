@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Popis Korisnika</title>
+</head>
+<body>
+    <h1>Popis Korisnika</h1>
+
+    <!-- Forma za filtriranje korisnika -->
+    <form method="get">
+        <label for="username">Korisničko ime:</label>
+        <input type="text" name="username" placeholder="Unesite korisničko ime" value="{{ request.GET.username }}">
+
+        <label for="email">Email:</label>
+        <input type="email" name="email" placeholder="Unesite email" value="{{ request.GET.email }}">
+
+        <label for="phone">Broj telefona:</label>
+        <input type="text" name="phone" placeholder="Unesite broj telefona" value="{{ request.GET.phone }}">
+
+        <button type="submit">Filtriraj</button>
+
+        <br><br>
+
+        <input type="text" name="q" placeholder="Pretraži korisnike..." value="{{ request.GET.q }}">
+        <button type="submit">Pretraži</button>
+    </form>
+
+    <hr>
+
+    <!-- Prikaz popisa korisnika -->
+    <ul>
+        {% for user in users %}
+            <li>
+                <strong>Korisničko ime:</strong> {{ user.username }}<br>
+                <strong>Email:</strong> {{ user.email }}<br>
+                <strong>Broj telefona:</strong> {{ user.phone_number|default:"N/A" }}
+            </li>
+        {% empty %}
+            <li>Nema korisnika koji odgovaraju pretrazi.</li>
+        {% endfor %}
+    </ul>
+</body>
+</html>

@@ -60,7 +60,7 @@ class Comment(models.Model):
 # Prijava na događaje
 class Participation(models.Model):
     event = models.ForeignKey(Event, on_delete=models.CASCADE, related_name='participants')
-    participant = models.ForeignKey(User, on_delete=models.CASCADE)
+    participant = models.ForeignKey(User, on_delete=models.CASCADE, related_name='participations')
     date_joined = models.DateTimeField(auto_now_add=True)
 
     class Meta:

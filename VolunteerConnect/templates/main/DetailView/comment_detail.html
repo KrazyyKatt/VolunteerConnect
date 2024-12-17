@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detalji Komentara</title>
+</head>
+<body>
+    <h1>Detalji Komentara</h1>
+    <p><strong>Autor:</strong> {{ comment.author.username }}</p>
+    <p><strong>Sadržaj:</strong> {{ comment.content }}</p>
+    <p><strong>Datum Kreiranja:</strong> {{ comment.created_at|date:"Y-m-d H:i" }}</p>
+
+    <hr>
+    <!-- Povezani događaj -->
+    <h2>Povezani Događaj</h2>
+    <p><strong>Naslov:</strong> <a href="{% url 'main:event_detail' comment.event.pk %}">{{ comment.event.title }}</a></p>
+    <p><strong>Opis:</strong> {{ comment.event.description }}</p>
+
+    <hr>
+    <a href="{% url 'main:comment_list' %}">Povratak na popis komentara</a>
+</body>
+</html>

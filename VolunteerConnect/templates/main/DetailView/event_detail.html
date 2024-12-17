@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detalji Događaja</title>
+</head>
+<body>
+    <h1>Detalji Događaja: {{ event.title }}</h1>
+    <p><strong>Opis:</strong> {{ event.description }}</p>
+    <p><strong>Lokacija:</strong> {{ event.location }}</p>
+    <p><strong>Datum:</strong> {{ event.date }}</p>
+    <p><strong>Kreirano:</strong> {{ event.created_at|date:"Y-m-d H:i" }}</p>
+    <p><strong>Ažurirano:</strong> {{ event.updated_at|date:"Y-m-d H:i" }}</p>
+    <p><strong>Organizator:</strong> {{ event.organizer.username }}</p>
+
+    <hr>
+
+    <!-- Prikaz komentara -->
+    <h2>Komentari</h2>
+    {% if comments %}
+        <ul>
+            {% for comment in comments %}
+                <li><strong>{{ comment.author.username }}:</strong> {{ comment.content }} ({{ comment.created_at|date:"Y-m-d" }})</li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>Nema komentara za ovaj događaj.</p>
+    {% endif %}
+
+    <hr>
+
+    <!-- Prikaz sudionika -->
+    <h2>Sudionici</h2>
+    {% if participants %}
+        <ul>
+            {% for participant in participants %}
+                <li>{{ participant.participant.username }} (prijavljeno: {{ participant.date_joined|date:"Y-m-d" }})</li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>Nema sudionika na ovom događaju.</p>
+    {% endif %}
+
+    <hr>
+
+    <!-- Prikaz priloga -->
+    <h2>Prilozi</h2>
+    {% if attachments %}
+        <ul>
+            {% for attachment in attachments %}
+                <li><a href="{{ attachment.file.url }}" target="_blank">{{ attachment.file.name }}</a></li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>Nema priloga za ovaj događaj.</p>
+    {% endif %}
+
+    <hr>
+    <a href="{% url 'main:event_list' %}">Povratak na popis događaja</a>
+</body>
+</html>

@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detalji Priloga</title>
+</head>
+<body>
+    <h1>Detalji Priloga</h1>
+    <p><strong>ID Priloga:</strong> {{ attachment.id }}</p>
+    <p><strong>Prilog:</strong> <a href="{{ attachment.file.url }}" target="_blank">{{ attachment.file.name }}</a></p>
+
+    <hr>
+    <!-- Povezani događaj -->
+    <h2>Povezani Događaj</h2>
+    <p><strong>Naslov:</strong> <a href="{% url 'main:event_detail' attachment.event.pk %}">{{ attachment.event.title }}</a></p>
+    <p><strong>Lokacija:</strong> {{ attachment.event.location }}</p>
+    <p><strong>Datum:</strong> {{ attachment.event.date }}</p>
+
+    <hr>
+    <a href="{% url 'main:attachment_list' %}">Povratak na popis priloga</a>
+</body>
+</html>
