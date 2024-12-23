@@ -1,0 +1,25 @@
+<a href="{% url 'main:home' %}">Vrati se na početni zaslon</a>
+<br><br>
+<h1>Događaji</h1>
+    <!-- Forma za filtriranje -->
+    <form method="get" action="">
+
+        <input type="text" name="user" placeholder="Korisnik" value="{{ request.GET.user }}">
+        <button type="submit">Filtriraj</button>
+    
+        <br><br>
+    
+        <input type="text" name="q" placeholder="Pretraži događaje..." value="{{ request.GET.q }}">
+        <button type="submit">Pretraži</button>
+    </form>
+    
+    <hr>
+
+<ul>
+    {% for event in events %}
+        <li><a href="{% url 'main:event_detail' event.pk %}">{{ event.title }}</a></li>
+    {% empty %}
+        <li>Nema događaja.</li>
+    {% endfor %}
+</ul>
+<h3><a href="{% url 'main:event_add' %}">Dodaj događaj</a></h3>

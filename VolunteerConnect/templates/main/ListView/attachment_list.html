@@ -1,3 +1,5 @@
+<a href="{% url 'main:home' %}">Vrati se na početni zaslon</a>
+<br><br>
 <h1>Popis Priloga</h1>
 <form method="get">
     <input type="text" name="filename" placeholder="Naziv datoteke" value="{{ request.GET.filename }}">

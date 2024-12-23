@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prijava na događaj</title>
+</head>
+<body>
+    <h1>Prijava na događaj: {{ event.title }}</h1>
+    <form method="post">
+        {% csrf_token %}
+        <p>Želite li sudjelovati na ovom događaju?</p>
+        <button type="submit">Potvrdi</button>
+    </form>
+    <br>
+    <a href="{% url 'main:event_detail' event_pk %}">Povratak na događaj</a>
+</body>
+</html>
+

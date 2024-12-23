@@ -6,6 +6,8 @@
     <title>Detalji Komentara</title>
 </head>
 <body>
+    <a href="{% url 'main:home' %}">Vrati se na početni zaslon</a>
+    <br><br>
     <h1>Detalji Komentara</h1>
     <p><strong>Autor:</strong> {{ comment.author.username }}</p>
     <p><strong>Sadržaj:</strong> {{ comment.content }}</p>

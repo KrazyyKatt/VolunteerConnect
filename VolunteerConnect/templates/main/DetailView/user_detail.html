@@ -6,6 +6,8 @@
     <title>Detalji Korisnika</title>
 </head>
 <body>
+    <a href="{% url 'main:home' %}">Vrati se na početni zaslon</a>
+    <br><br>
     <h1>Detalji Korisnika</h1>
     <p><strong>ID:</strong> {{ user.id }}</p>
     <p><strong>Korisničko ime:</strong> {{ user.username }}</p>

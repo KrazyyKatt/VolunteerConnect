@@ -1,26 +1,28 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Home</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Početna Stranica</title>
 </head>
 <body>
+    <h1>Dobrodošao, {{ user.username }}!</h1>
+    <p>Email: {{ user.email }}</p>
+    <p>Prijavljen kao: {{ user.get_full_name|default:user.username }}</p>
 
-    <nav>
-        {% if user.is_authenticated %}
-            <p>Welcome, {{ user.username }}!</p>
-            <a href="http://127.0.0.1:8000/logout">Logout</a>
-        {% else %}
-            <a href="http://127.0.0.1:8000/accounts/login/">Login</a>
-            <a href="http://127.0.0.1:8000/register/">Register</a>
-        {% endif %}
-    </nav>
+    <hr>
 
-    <h1>Welcome to the Home Page!</h1>
-    <p>This is your home page. Customize it as you like.</p>
-    {% if user.is_authenticated %}
-        <p>Welcome back, {{ user.username }}!</p>
-    {% else %}
-        <p><a href="http://127.0.0.1:8000/accounts/login/">Login</a> or <a href="http://127.0.0.1:8000/register/">Register</a></p>
-    {% endif %}
+    <!-- Poveznice na važne dijelove aplikacije -->
+    <h2>Opcije:</h2>
+    <ul>
+        <li><a href="{% url 'main:event_list' %}">Pregled Događaja</a></li>
+        <li><a href="{% url 'main:participation_list' %}">Moja Sudjelovanja</a></li>
+        <li><a href="{% url 'main:comment_list' %}">Pregled Komentara</a></li>
+        <li><a href="{% url 'main:user_detail' user.id %}">Moj Profil</a></li>
+    </ul>
+
+    <hr>
+
+    <p><a href="http://127.0.0.1:8000/logout">Odjava</a></p>
 </body>
 </html>

@@ -6,6 +6,8 @@
     <title>Detalji Događaja</title>
 </head>
 <body>
+    <a href="{% url 'main:home' %}">Vrati se na početni zaslon</a>
+    <br><br>
     <h1>Detalji Događaja: {{ event.title }}</h1>
     <p><strong>Opis:</strong> {{ event.description }}</p>
     <p><strong>Lokacija:</strong> {{ event.location }}</p>

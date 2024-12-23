@@ -1,3 +1,5 @@
+<a href="{% url 'main:home' %}">Vrati se na početni zaslon</a>
+<br><br>
 <h1>Popis Komentara</h1>
 <form method="get">
     <input type="text" name="author" placeholder="Autor komentara" value="{{ request.GET.author }}">

@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dodaj Događaj</title>
+</head>
+<body>
+    <a href="{% url 'main:home' %}">Vrati se na početni zaslon</a>
+    <br><br>
+    <h1>Dodaj Događaj</h1>
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <!-- Glavna forma za događaj -->
+        {{ form.as_p }}
+
+        <h2>Dodaj Priloge</h2>
+        <!-- Forma za priloge -->
+        {{ attachment_formset.management_form }}
+        {% for form in attachment_formset %}
+            {{ form.as_p }}
+        {% endfor %}
+
+        <button type="submit">Spremi</button>
+    </form>
+    <a href="{% url 'main:event_list' %}">Povratak na popis događaja</a>
+</body>
+</html>

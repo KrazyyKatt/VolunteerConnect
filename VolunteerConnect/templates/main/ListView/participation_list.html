@@ -1,16 +1,21 @@
+<a href="{% url 'main:home' %}">Vrati se na početni zaslon</a>
+<br><br>
 <h1>Popis Sudjelovanja</h1>
 <form method="get">
-    <input type="text" name="user" placeholder="Korisnik" value="{{ request.GET.user }}">
-    <button type="submit">Filtriraj</button>
+    <!-- Filtriranje po korisnicima koji su organizatori -->
+    <input type="text" name="user" placeholder="Korisnik (organizator)" value="{{ request.GET.user }}">
 
-    <br><br>
+    <!-- Pretraživanje po naslovu događaja -->
+    <input type="text" name="q" placeholder="Pretraži naslove događaja..." value="{{ request.GET.q }}">
 
-    <input type="text" name="q" placeholder="Pretraži sudionike ili događaje..." value="{{ request.GET.q }}">
-    <button type="submit">Pretraži</button>
+    <button type="submit">Primijeni</button>
 </form>
+
+<hr>
+
 <ul>
     {% for participation in participations %}
-        <li>{{ participation.participant.username }} - {{ participation.event.title }}</li>
+        <li>{{ participation.participant.username }} - <a href="{% url 'main:event_detail' pk=participation.event.pk %}" >{{ participation.event.title }}</a></li>
     {% empty %}
         <li>Nema sudjelovanja.</li>
     {% endfor %}

@@ -1,0 +1,70 @@
+<a href="{% url 'main:home' %}">Vrati se na početni zaslon</a>
+<br><br>
+{% load custom_filters %}
+<h1>{{ event.title }}</h1>
+<p>{{ event.description }}</p>
+<p>Lokacija: {{ event.location }}</p>
+<p>Datum: {{ event.date }}</p>
+<p>Organizator: {{ event.organizer.username }}</p>
+<a href="{% url 'main:event_edit' event.pk %}">Uredi</a>
+<a href="{% url 'main:event_delete' event.pk %}">Obriši</a>
+
+<hr>
+
+
+<!-- Prikaz slike -->
+<h2>Prilozi</h2>
+{% if attachments %}
+        {% for attachment in attachments %}
+                {% if attachment.file.url|is_image %}
+                    <!-- Prikaz slike -->
+                    <img src="{{ attachment.file.url }}" alt="Prilog" style="max-width: 300px; max-height: 300px;">
+                {% else %}
+                    <!-- Prikaz poveznice za preuzimanje -->
+                    <a href="{{ attachment.file.url }}" target="_blank">
+                        {{ attachment.file.name }}
+                    </a>
+                {% endif %}
+        {% endfor %}
+{% else %}
+    <p>Nema priloga za ovaj događaj.</p>
+{% endif %}
+
+<br>
+<hr>
+<br>
+
+<!-- Sudjelovanje u eventu -->
+{% if user.is_authenticated and user != event.organizer %}
+    {% if not is_participating %}
+        <a href="{% url 'main:participate_in_event' event.pk %}" class="btn btn-primary">
+            Sudjeluj
+        </a>
+    {% else %}
+        <p>Već sudjelujete na ovom događaju.</p>
+        <a href="{% url 'main:withdraw_from_event' event.pk %}" class="btn btn-danger">
+            Odustani od sudjelovanja
+        </a>
+    {% endif %}
+{% endif %}
+
+<hr>
+
+<!-- Komentari -->
+<h3>Komentari</h3>
+<ul>
+    {% for comment in event.comments.all %}
+        <li>
+            {{ comment.author.username }}: {{ comment.content }}
+            {% if user == comment.author %}
+                <!-- Opcija za brisanje komentara -->
+                <a href="{% url 'main:delete_comment' pk=comment.pk %}" class="btn btn-danger btn-sm">
+                    Obriši
+                </a>
+            {% endif %}
+        </li>
+    {% empty %}
+        <li>Nema komentara.</li>
+    {% endfor %}
+</ul>
+<a href="{% url 'main:comment_add' event.pk %}">Dodaj komentar</a>

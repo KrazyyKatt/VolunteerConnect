@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dodaj Prilog</title>
+</head>
+<body>
+    <a href="{% url 'main:home' %}">Vrati se na početni zaslon</a>
+    <br><br>
+    <h1>Dodaj Prilog</h1>
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Spremi</button>
+    </form>
+    <a href="{% url 'main:event_detail' event_pk %}">Povratak na događaj</a>
+</body>
+</html>

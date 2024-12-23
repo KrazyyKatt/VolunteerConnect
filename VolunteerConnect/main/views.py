@@ -1,17 +1,39 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from .forms import CustomUserCreationForm
 from django.contrib.auth import login, logout
 from django.contrib.auth.models import Permission, Group
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.auth.decorators import permission_required
 
+
+# Homepage
+
+from django.contrib.auth.decorators import login_required
+
+@login_required
 def home(request):
-    return render(request, 'main/home.html')
+    context = {
+        'user': request.user,  # Trenutno prijavljeni korisnik
+    }
+    return render(request, 'main/home.html', context)
 
 # Funkcija za odjavu
 def custom_logout(request):
     logout(request) 
     return redirect('http://127.0.0.1:8000/home/')
+
+# Funkcija za odjavu sa događaja
+def withdraw_from_event(request, pk):
+    event = get_object_or_404(Event, pk=pk)
+    participation = Participation.objects.filter(event=event, participant=request.user).first()
+
+    if participation:
+        participation.delete()
+        messages.success(request, 'Uspješno ste odustali od sudjelovanja u događaju.')
+    else:
+        messages.error(request, 'Niste prijavljeni na ovaj događaj.')
+
+    return redirect('main:event_detail', pk=event.pk)
 
 
 
@@ -95,24 +117,25 @@ class EventListView(ListView):
 
         return queryset
     
-class ParticipationListView(ListView):
+from django.contrib.auth.mixins import LoginRequiredMixin
+
+class ParticipationListView(LoginRequiredMixin, ListView):
     model = Participation
     template_name = 'main/ListView/participation_list.html'
     context_object_name = 'participations'
 
     def get_queryset(self):
-        queryset = super().get_queryset()
-        user = self.request.GET.get('user')
-        
-        if user:
-            queryset = queryset.filter(participant__username=user)
-        
-        
-        search_query = self.request.GET.get('q')
-        if search_query:
-            queryset = queryset.filter(
-                models.Q(event__title__icontains=search_query) | models.Q(participant__username__icontains=search_query)
-            )
+        queryset = Participation.objects.filter(participant=self.request.user)
+
+        # Filtriranje po organizatoru
+        organizer = self.request.GET.get('user')
+        if organizer:
+            queryset = queryset.filter(event__organizer__username__icontains=organizer)
+
+        # Pretraživanje po naslovu događaja
+        query = self.request.GET.get('q')
+        if query:
+            queryset = queryset.filter(event__title__icontains=query)
 
         return queryset
 
@@ -285,3 +308,186 @@ class UserDetailView(DetailView):
         context['participations'] = user.participations.all() 
 
         return context
+    
+# Event
+
+from django.urls import reverse_lazy
+from django.views.generic import CreateView, ListView, DetailView, UpdateView, DeleteView
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+
+# Kreiranje događaja
+from django.shortcuts import redirect
+from django.forms import modelform_factory
+from .forms import AttachmentFormSet
+from .models import Event
+
+class EventCreateView(LoginRequiredMixin, CreateView):
+    model = Event
+    fields = ['title', 'description', 'date', 'location']  # Polja za Event
+    template_name = 'main/Event/event_form.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        if self.request.POST:
+            context['attachment_formset'] = AttachmentFormSet(self.request.POST, self.request.FILES)
+        else:
+            context['attachment_formset'] = AttachmentFormSet()
+        return context
+
+    def form_valid(self, form):
+        context = self.get_context_data()
+        attachment_formset = context['attachment_formset']
+        form.instance.organizer = self.request.user
+        if form.is_valid() and attachment_formset.is_valid():
+            self.object = form.save()
+            attachment_formset.instance = self.object
+            attachment_formset.save()
+            return redirect(self.get_success_url())
+        else:
+            return self.form_invalid(form)
+
+    def get_success_url(self):
+        return reverse_lazy('main:event_list')  # Nakon uspješnog kreiranja, preusmjeri na popis događaja
+
+# Popis događaja
+class EventListView(LoginRequiredMixin, ListView):
+    model = Event
+    template_name = 'main/Event/event_list.html'
+    context_object_name = 'events'
+
+    def get_queryset(self):
+        queryset = Event.objects.all()
+
+        # Filtriranje po imenu organizatora
+        organizer = self.request.GET.get('user')
+        if organizer:
+            queryset = queryset.filter(organizer__username__icontains=organizer)
+
+        # Pretraživanje po naslovu događaja
+        query = self.request.GET.get('q')
+        if query:
+            queryset = queryset.filter(title__icontains=query)
+
+        return queryset
+
+# Detalji događaja
+class EventDetailView(LoginRequiredMixin, DetailView):
+    model = Event
+    template_name = 'main/Event/event_detail.html'
+    context_object_name = 'event'
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        # Dodavanje svih priloga povezanih s događajem u kontekst
+        context['attachments'] = self.object.attachments.all()
+        event = self.get_object()
+        user = self.request.user
+        
+        if user.is_authenticated:
+            context['is_participating'] = Participation.objects.filter(event=event, participant=user).exists()
+        else:
+            context['is_participating'] = False
+            
+        return context
+
+# Uređivanje događaja
+class EventUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
+    model = Event
+    fields = ['title', 'description', 'date', 'location']
+    template_name = 'main/Event/event_form.html'
+
+    def test_func(self):
+        return self.get_object().organizer == self.request.user
+
+    def get_success_url(self):
+        return reverse_lazy('main:event_detail', kwargs={'pk': self.object.pk})
+
+# Brisanje događaja
+class EventDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
+    model = Event
+    template_name = 'main/Event/event_confirm_delete.html'
+
+    def test_func(self):
+        return self.get_object().organizer == self.request.user
+
+    def get_success_url(self):
+        return reverse_lazy('main:event_list')
+    
+    
+# Comments
+class CommentCreateView(LoginRequiredMixin, CreateView):
+    model = Comment
+    fields = ['content']
+    template_name = 'main/Comment/comment_form.html'
+
+    def form_valid(self, form):
+        form.instance.author = self.request.user
+        form.instance.event = Event.objects.get(pk=self.kwargs['event_pk'])
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        return reverse_lazy('main:event_detail', kwargs={'pk': self.kwargs['event_pk']})
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['event_pk'] = self.kwargs['event_pk']  # Dodaj event_pk u kontekst
+        return context
+    
+def delete_comment(request, pk):
+    comment = get_object_or_404(Comment, pk=pk)
+
+    # Provjeri je li trenutni korisnik autor komentara
+    if comment.author == request.user:
+        comment.delete()
+        messages.success(request, 'Uspješno ste obrisali svoj komentar.')
+    else:
+        messages.error(request, 'Niste ovlašteni obrisati ovaj komentar.')
+
+    return redirect('main:event_detail', pk=comment.event.pk)
+
+
+# Participation
+
+from django.shortcuts import get_object_or_404
+from django.urls import reverse_lazy
+from django.contrib import messages
+from .models import Event, Participation
+
+
+class ParticipationCreateView(LoginRequiredMixin, CreateView):
+    model = Participation
+    fields = []
+    template_name = 'main/Participation/participation_form.html'
+
+    def form_valid(self, form):
+        event = get_object_or_404(Event, pk=self.kwargs['event_pk'])
+        form.instance.participant = self.request.user
+        form.instance.event = Event.objects.get(pk=self.kwargs['event_pk'])
+    
+        if Participation.objects.filter(event=event, participant=self.request.user).exists():
+            messages.warning(self.request, 'Već ste prijavljeni na ovaj događaj.')
+            return redirect('main:event_detail', pk=event.pk)
+
+        messages.success(self.request, 'Uspješno ste se prijavili na događaj!')
+        return super().form_valid(form)
+    
+    def get_success_url(self):
+        return reverse_lazy('main:event_detail', kwargs={'pk': self.object.event.pk})
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['event_pk'] = self.kwargs['event_pk']
+        return context
+    
+# Attachment
+class AttachmentCreateView(LoginRequiredMixin, CreateView):
+    model = Attachment
+    fields = ['file']
+    template_name = 'main/Attachment/attachment_form.html'
+
+    def form_valid(self, form):
+        form.instance.event = Event.objects.get(pk=self.kwargs['event_pk'])
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        return reverse_lazy('main:event_detail', kwargs={'pk': self.kwargs['event_pk']})

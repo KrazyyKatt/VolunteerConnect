@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Brisanje Događaja</title>
+</head>
+<body>
+    <a href="{% url 'main:home' %}">Vrati se na početni zaslon</a>
+    <br><br>
+    <h1>Brisanje Događaja</h1>
+    <p>Jeste li sigurni da želite obrisati događaj "{{ event.title }}"?</p>
+    <form method="post">
+        {% csrf_token %}
+        <button type="submit">Da, obriši</button>
+        <a href="{% url 'main:event_detail' event.pk %}">Ne, povratak</a>
+    </form>
+</body>
+</html>

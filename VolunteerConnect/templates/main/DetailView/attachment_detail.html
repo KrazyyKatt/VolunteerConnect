@@ -6,6 +6,8 @@
     <title>Detalji Priloga</title>
 </head>
 <body>
+    <a href="{% url 'main:home' %}">Vrati se na početni zaslon</a>
+    <br><br>
     <h1>Detalji Priloga</h1>
     <p><strong>ID Priloga:</strong> {{ attachment.id }}</p>
     <p><strong>Prilog:</strong> <a href="{{ attachment.file.url }}" target="_blank">{{ attachment.file.name }}</a></p>

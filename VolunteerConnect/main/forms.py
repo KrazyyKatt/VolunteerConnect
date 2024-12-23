@@ -25,3 +25,16 @@ class CustomUserCreationForm(forms.ModelForm):
         if commit:
             user.save()
         return user
+    
+from django import forms
+from django.forms.models import inlineformset_factory
+from .models import Event, Attachment
+
+# Kreiraj inline formset za Attachment
+AttachmentFormSet = inlineformset_factory(
+    Event,
+    Attachment,
+    fields=['file'],
+    extra=1,  # Po defaultu prikaži 1 prazan red za prilog
+    can_delete=True  # Omogući korisniku da obriše priložene datoteke
+)
