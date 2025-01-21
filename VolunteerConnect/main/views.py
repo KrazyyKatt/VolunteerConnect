@@ -491,3 +491,45 @@ class AttachmentCreateView(LoginRequiredMixin, CreateView):
 
     def get_success_url(self):
         return reverse_lazy('main:event_detail', kwargs={'pk': self.kwargs['event_pk']})
+
+
+# REST
+
+# Event
+
+from rest_framework.generics import ListCreateAPIView, RetrieveAPIView
+from rest_framework.permissions import IsAuthenticated, IsAdminUser
+from .models import *
+from .serializers import EventSerializer
+
+from django.contrib.auth.models import User
+from .serializers import UserSerializer
+
+class EventListCreateView(ListCreateAPIView):
+    queryset = Event.objects.all()
+    serializer_class = EventSerializer
+    permission_classes = [IsAuthenticated] 
+
+class EventDetailView(RetrieveAPIView):
+    queryset = Event.objects.all()
+    serializer_class = EventSerializer
+    permission_classes = [IsAuthenticated]
+
+
+# Users
+
+class UserListCreateView(ListCreateAPIView):
+    queryset = CustomUser.objects.all()
+    serializer_class = UserSerializer
+    permission_classes = [IsAdminUser]
+
+
+class UserDetailView(RetrieveAPIView):
+    queryset = CustomUser.objects.all()
+    serializer_class = UserSerializer
+    permission_classes = [IsAdminUser]
+
+   
+
+
+    

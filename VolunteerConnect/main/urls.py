@@ -44,6 +44,16 @@ urlpatterns = [
 
     # Attachment
     path('events/<int:event_pk>/attachments/add/', AttachmentCreateView.as_view(), name='attachment_add'),
+
+    # REST
+
+    # Events
+    path('api/events/', EventListCreateView.as_view(), name='event_list_create'),
+    path('api/events/<int:pk>/', EventDetailView.as_view(), name='event_detail'),
+
+    # Users
+    path('api/users/', UserListCreateView.as_view(), name='user_list_create'),
+    path('api/users/<int:pk>/', UserDetailView.as_view(), name='user_detail'),
     
     
 ]
