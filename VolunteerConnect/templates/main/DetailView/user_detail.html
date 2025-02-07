@@ -4,44 +4,24 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Detalji Korisnika</title>
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
-    <a href="{% url 'main:home' %}">Vrati se na početni zaslon</a>
-    <br><br>
-    <h1>Detalji Korisnika</h1>
-    <p><strong>ID:</strong> {{ user.id }}</p>
-    <p><strong>Korisničko ime:</strong> {{ user.username }}</p>
-    <p><strong>Email:</strong> {{ user.email }}</p>
-    <p><strong>Telefon:</strong> {{ user.phone_number }}</p>
-    <p><strong>Adresa:</strong> {{ user.address }}</p>
+<body class="flex items-center justify-center min-h-screen bg-gray-100">
+    <div class="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
+        <h1 class="text-2xl font-semibold text-gray-800 text-center">Detalji Korisnika</h1>
+        <p class="mt-4 text-gray-600"><strong>Korisničko ime:</strong> {{ user.username }} </p>
+        <p class="mt-4 text-gray-600"><strong>Email:</strong> {{ user.email }} </p>
 
-    <hr>
-    <!-- Organizirani događaji -->
-    <h2>Događaji koje je korisnik organizirao</h2>
-    {% if organized_events %}
-        <ul>
-            {% for event in organized_events %}
-                <li><a href="{% url 'main:event_detail' event.pk %}">{{ event.title }}</a> ({{ event.date|date:"Y-m-d" }})</li>
-            {% endfor %}
+        <ul class="mt-4 space-y-3 text-left">
+        <li><a href="{% url 'main:participation_list' %}" class="text-blue-600 hover:underline">Moja Sudjelovanja</a></li>
+        <li><a href="{% url 'main:my_event_list' %}" class="text-blue-600 hover:underline">Moji događaji</a></li>
         </ul>
-    {% else %}
-        <p>Korisnik nije organizirao nijedan događaj.</p>
-    {% endif %}
+        
+        <hr class="my-6">
 
-    <hr>
-    <!-- Sudjelovanja -->
-    <h2>Događaji na kojima korisnik sudjeluje</h2>
-    {% if participations %}
-        <ul>
-            {% for participation in participations %}
-                <li><a href="{% url 'main:event_detail' participation.event.pk %}">{{ participation.event.title }}</a></li>
-            {% endfor %}
-        </ul>
-    {% else %}
-        <p>Korisnik ne sudjeluje ni na jednom događaju.</p>
-    {% endif %}
-
-    <hr>
-    <a href="{% url 'main:user_list' %}">Povratak na popis korisnika</a>
+        <div class="mt-6 flex justify-between">
+            <a href="{% url 'main:home' %}" class="text-blue-600 hover:underline">🏠 Početna</a>
+        </div>
+    </div>
 </body>
 </html>

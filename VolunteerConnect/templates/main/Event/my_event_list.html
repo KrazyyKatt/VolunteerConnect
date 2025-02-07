@@ -3,30 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Događaji</title>
+    <title>Moji Organizirani Događaji</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="flex items-center justify-center min-h-screen bg-gray-100">
+<body class="bg-gray-100 min-h-screen flex items-center justify-center">
     <div class="bg-white p-8 rounded-lg shadow-lg w-full max-w-lg">
-        <h1 class="text-2xl font-semibold text-gray-800 text-center">Popis Događaja</h1>
-
-        <form method="get" class="mt-4 space-y-2">
-            <input type="text" name="user" placeholder="Filtriraj po korisniku" class="w-full p-2 border rounded">
-            <input type="text" name="q" placeholder="Pretraži događaje..." class="w-full p-2 border rounded">
-            <button type="submit" class="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700">
-                Primijeni
-            </button>
-        </form>
+        <h1 class="text-2xl font-semibold text-gray-800 text-center">Moji Organizirani Događaji</h1>
         
         <ul class="mt-6 space-y-2">
             {% for event in events %}
                 <li>
-                    <a href="{% url 'main:event_detail' event.pk %}" class="text-blue-600 hover:underline">{{ event.title }}</a>
+                    <a href="{% url 'main:event_detail' event.pk %}" class="text-blue-600 hover:underline">
+                        {{ event.title }}
+                    </a>
                     <p class="text-gray-600">Lokacija: {{ event.location }}</p>
                     <p class="text-gray-600">Datum: {{ event.date }}</p>
                 </li>
             {% empty %}
-                <li class="text-gray-600">Nema događaja.</li>
+                <li class="text-gray-600">Niste organizirali ni jedan događaj.</li>
             {% endfor %}
         </ul>
 
@@ -34,6 +28,7 @@
 
         <div class="mt-6 flex justify-between">
             <a href="{% url 'main:home' %}" class="text-blue-600 hover:underline">🏠 Početna</a>
+            <a href="{% url 'main:user_detail' user.id %}" class="text-blue-600 hover:underline">🔙 Povratak na profil</a>
         </div>
     </div>
 </body>

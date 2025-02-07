@@ -4,25 +4,44 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dodaj Događaj</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        input[type="text"], input[type="date"], input[type="file"], textarea {
+            border: 1px solid #ccc;
+            padding: 2px;
+            border-radius: 2px;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        input[type="text"]:focus, input[type="date"]:focus, input[type="file"]:focus, textarea:focus {
+            border-color: #4CAF50;
+            box-shadow: 0 0 5px #4CAF50;
+        }
+    </style>
 </head>
-<body>
-    <a href="{% url 'main:home' %}">Vrati se na početni zaslon</a>
-    <br><br>
-    <h1>Dodaj Događaj</h1>
-    <form method="post" enctype="multipart/form-data">
-        {% csrf_token %}
-        <!-- Glavna forma za događaj -->
-        {{ form.as_p }}
+<body class="flex items-center justify-center min-h-screen bg-gray-100">
+    <div class="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
+        <h1 class="text-2xl font-semibold text-gray-800 text-center">Dodaj Događaj</h1>
 
-        <h2>Dodaj Priloge</h2>
-        <!-- Forma za priloge -->
-        {{ attachment_formset.management_form }}
-        {% for form in attachment_formset %}
+        <form method="post" enctype="multipart/form-data" class="mt-6 space-y-4">
+            {% csrf_token %}
             {{ form.as_p }}
-        {% endfor %}
 
-        <button type="submit">Spremi</button>
-    </form>
-    <a href="{% url 'main:event_list' %}">Povratak na popis događaja</a>
+            <h2 class="text-xl font-semibold text-gray-800">Dodaj Priloge</h2>
+            {{ attachment_formset.management_form }}
+            {% for form in attachment_formset %}
+                {{ form.as_p }}
+            {% endfor %}
+
+            <button type="submit" class="w-full px-4 py-2 bg-green-600 text-white rounded-lg shadow-md hover:bg-green-700">
+                Spremi
+            </button>
+        </form>
+
+        <div class="mt-6 flex justify-between">
+            <a href="{% url 'main:home' %}" class="text-blue-600 hover:underline">🏠 Početna</a>
+        </div>
+    </div>
 </body>
 </html>

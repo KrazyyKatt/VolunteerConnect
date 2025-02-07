@@ -3,39 +3,32 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Event List</title>
+    <title>Popis Događaja</title>
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
-    <a href="{% url 'main:home' %}">Vrati se na početni zaslon</a>
-    <br><br>
-    <h1>Popis Događaja</h1>
+<body class="flex items-center justify-center min-h-screen bg-gray-100">
+    <div class="bg-white p-8 rounded-lg shadow-lg w-full max-w-lg">
+        <h1 class="text-2xl font-semibold text-gray-800 text-center">Popis Događaja</h1>
 
-    <!-- Forma za filtriranje -->
-    <form method="get" action="">
+        <form method="get" class="mt-4 space-y-2">
+            <input type="date" name="date" class="w-full p-2 border rounded">
+            <input type="text" name="q" placeholder="Pretraži događaje..." class="w-full p-2 border rounded">
+            <button type="submit" class="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700">
+                Filtriraj
+            </button>
+        </form>
 
-        <label for="date">Datum kreiranja:</label>
-        <input type="date" name="date" value="{{ request.GET.date }}">
-
-        <button type="submit">Filtriraj</button>
-
-        <br><br>
-
-        <input type="text" name="q" placeholder="Pretraži događaje..." value="{{ request.GET.q }}">
-        <button type="submit">Pretraži</button>
-    </form>
-
-    <hr>
-
-    <!-- Prikaz rezultata -->
-    <ul>
-        {% for event in events %}
-            <li>
-                <strong>{{ event.title }}</strong> - {{ event.description }}<br>
-                Kategorija: {{ event.category }} | Datum: {{ event.created_at|date:"Y-m-d" }}
-            </li>
-        {% empty %}
-            <li>Nema događaja za prikaz.</li>
-        {% endfor %}
-    </ul>
+        <ul class="mt-6 space-y-2">
+            {% for event in events %}
+                <li>
+                    <a href="{% url 'main:event_detail' event.pk %}" class="text-blue-600 hover:underline">
+                        {{ event.title }}
+                    </a>
+                </li>
+            {% empty %}
+                <li class="text-gray-600">Nema događaja.</li>
+            {% endfor %}
+        </ul>
+    </div>
 </body>
 </html>

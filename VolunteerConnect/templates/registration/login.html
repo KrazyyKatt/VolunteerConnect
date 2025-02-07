@@ -1,19 +1,51 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        input[type="text"], input[type="password"], textarea {
+            border: 1px solid #ccc;
+            padding: 2px;
+            border-radius: 2px;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        input[type="text"]:focus, input[type="password"]:focus, textarea:focus {
+            border-color: #4CAF50;
+            box-shadow: 0 0 5px #4CAF50;
+        }
+    </style>
 </head>
-<body>
-    <h1>Login</h1>
-    {% if form.errors %}
-        <p>There were errors in your form:</p>
-        {{ form.errors }}
-    {% endif %}
-    <form method="post">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit">Login</button>
-    </form>
-    <p>Don't have an account? <a href="http://127.0.0.1:8000/register/">Register here</a>.</p>
+<body class="flex items-center justify-center min-h-screen bg-gray-100">
+    <div class="bg-white p-8 rounded-lg shadow-lg w-full max-w-sm">
+        <h1 class="text-2xl font-semibold text-gray-800 text-center">Login</h1>
+        
+        {% if form.errors %}
+            <p class="text-red-500 text-sm mt-2">There were errors in your form:</p>
+            <div class="text-red-500 text-sm">
+                {{ form.errors }}
+            </div>
+        {% endif %}
+        
+        <form method="post" class="mt-4">
+            {% csrf_token %}
+            <div class="space-y-4">
+                {{ form.as_p }}
+            </div>
+            <button type="submit" 
+                    class="mt-4 w-full px-4 py-2 bg-blue-600 text-white rounded-lg shadow-md hover:bg-blue-700">
+                Login
+            </button>
+        </form>
+
+        <p class="mt-4 text-center text-gray-600">
+            Don't have an account? 
+            <a href="http://127.0.0.1:8000/register/" class="text-blue-600 hover:underline">Register here</a>.
+        </p>
+    </div>
 </body>
 </html>

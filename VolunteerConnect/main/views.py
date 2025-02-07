@@ -1,14 +1,23 @@
+# Djnago
 from django.shortcuts import render, redirect, get_object_or_404
-from .forms import CustomUserCreationForm
+from django.contrib import messages
 from django.contrib.auth import login, logout
 from django.contrib.auth.models import Permission, Group
-from django.contrib.contenttypes.models import ContentType
-from django.contrib.auth.decorators import permission_required
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from django.contrib.auth.decorators import permission_required, login_required
+from django.urls import reverse_lazy
+from django.views.generic import CreateView, ListView, DetailView, UpdateView, DeleteView
 
+# Models/Forms
+from .models import *
+from .forms import *
+
+# REST API
+from rest_framework.generics import ListCreateAPIView, RetrieveAPIView
+from rest_framework.permissions import IsAuthenticated, IsAdminUser
+from .serializers import EventSerializer, UserSerializer
 
 # Homepage
-
-from django.contrib.auth.decorators import login_required
 
 @login_required
 def home(request):
@@ -36,11 +45,9 @@ def withdraw_from_event(request, pk):
     return redirect('main:event_detail', pk=event.pk)
 
 
-
 @permission_required('main.view_event', raise_exception=True)
 def view_event(request):
     return render(request, 'main/event.html')
-
 
 
 # Funkcija za registraciju
@@ -95,29 +102,38 @@ def register(request):
 
 
 # Generički pogledi ListView
-from django.views.generic import ListView
-from .models import *
 
-class EventListView(ListView):
+# Popis događaja
+class EventListView(LoginRequiredMixin, ListView):
     model = Event
-    template_name = 'main/ListView/event_list.html'
+    template_name = 'main/Event/event_list.html'
     context_object_name = 'events'
 
     def get_queryset(self):
-        queryset = super().get_queryset()
-        search_query = self.request.GET.get('q') 
-        date_query = self.request.GET.get('date') 
+        queryset = Event.objects.all()
 
-        if search_query:
-            queryset = queryset.filter(
-                models.Q(title__icontains=search_query) | models.Q(description__icontains=search_query)
-            )
-        if date_query:
-            queryset = queryset.filter(date__date=date_query)
+        # Filtriranje po imenu organizatora
+        organizer = self.request.GET.get('user')
+        if organizer:
+            queryset = queryset.filter(organizer__username__icontains=organizer)
+
+        # Pretraživanje po naslovu događaja
+        query = self.request.GET.get('q')
+        if query:
+            queryset = queryset.filter(title__icontains=query)
 
         return queryset
     
-from django.contrib.auth.mixins import LoginRequiredMixin
+
+class MyEventListView(LoginRequiredMixin, ListView):
+    model = Event
+    template_name = 'main/Event/my_event_list.html' 
+    context_object_name = 'events'
+
+    def get_queryset(self):
+        # Filtriraj događaje koje je organizirao prijavljeni korisnik
+        return Event.objects.filter(organizer=self.request.user)
+    
 
 class ParticipationListView(LoginRequiredMixin, ListView):
     model = Participation
@@ -189,10 +205,8 @@ class UserListView(ListView):
     template_name = 'main/ListView/user_list.html' 
     context_object_name = 'users' 
 
-    def get_queryset(self):
-        """
-        Filtriranje korisnika prema GET parametrima (username, email, phone_number).
-        """
+    # Filtriranje korisnika
+    def get_queryset(self): 
         queryset = super().get_queryset()
         username = self.request.GET.get('username')
         email = self.request.GET.get('email') 
@@ -215,26 +229,25 @@ class UserListView(ListView):
 
     
 # Generički pogledi DetailView
-from django.views.generic import DetailView
-from .models import *
 
-class EventDetailView(DetailView):
+# Detalji događaja
+class EventDetailView(LoginRequiredMixin, DetailView):
     model = Event
-    template_name = 'main/DetailView/event_detail.html' 
-    context_object_name = 'event' 
-
+    template_name = 'main/Event/event_detail.html'
+    context_object_name = 'event'
+    
     def get_context_data(self, **kwargs):
-        """
-        Dodavanje relacija u kontekst predloška (npr. komentari, sudjelovanja, prilozi).
-        """
         context = super().get_context_data(**kwargs)
-        event = self.get_object() 
-
-        # Dodavanje relacija
-        context['comments'] = event.comments.all() 
-        context['participants'] = event.participants.all() 
-        context['attachments'] = event.attachments.all() 
-
+        # Dodavanje svih priloga povezanih s događajemt
+        context['attachments'] = self.object.attachments.all()
+        event = self.get_object()
+        user = self.request.user
+        
+        if user.is_authenticated:
+            context['is_participating'] = Participation.objects.filter(event=event, participant=user).exists()
+        else:
+            context['is_participating'] = False
+            
         return context
     
 
@@ -244,9 +257,6 @@ class CommentDetailView(DetailView):
     context_object_name = 'comment'
 
     def get_context_data(self, **kwargs):
-        """
-        Dodavanje relacija u kontekst predloška.
-        """
         context = super().get_context_data(**kwargs)
         comment = self.get_object()
 
@@ -262,9 +272,6 @@ class ParticipationDetailView(DetailView):
     context_object_name = 'participation'
 
     def get_context_data(self, **kwargs):
-        """
-        Dodavanje relacija u kontekst predloška.
-        """
         context = super().get_context_data(**kwargs)
         participation = self.get_object()
 
@@ -280,9 +287,6 @@ class AttachmentDetailView(DetailView):
     context_object_name = 'attachment'
 
     def get_context_data(self, **kwargs):
-        """
-        Dodavanje relacija u kontekst predloška.
-        """
         context = super().get_context_data(**kwargs)
         attachment = self.get_object()
 
@@ -297,9 +301,6 @@ class UserDetailView(DetailView):
     context_object_name = 'user'
 
     def get_context_data(self, **kwargs):
-        """
-        Dodavanje relacija u kontekst predloška.
-        """
         context = super().get_context_data(**kwargs)
         user = self.get_object()
 
@@ -309,18 +310,10 @@ class UserDetailView(DetailView):
 
         return context
     
+
 # Event
 
-from django.urls import reverse_lazy
-from django.views.generic import CreateView, ListView, DetailView, UpdateView, DeleteView
-from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
-
 # Kreiranje događaja
-from django.shortcuts import redirect
-from django.forms import modelform_factory
-from .forms import AttachmentFormSet
-from .models import Event
-
 class EventCreateView(LoginRequiredMixin, CreateView):
     model = Event
     fields = ['title', 'description', 'date', 'location']  # Polja za Event
@@ -349,46 +342,6 @@ class EventCreateView(LoginRequiredMixin, CreateView):
     def get_success_url(self):
         return reverse_lazy('main:event_list')  # Nakon uspješnog kreiranja, preusmjeri na popis događaja
 
-# Popis događaja
-class EventListView(LoginRequiredMixin, ListView):
-    model = Event
-    template_name = 'main/Event/event_list.html'
-    context_object_name = 'events'
-
-    def get_queryset(self):
-        queryset = Event.objects.all()
-
-        # Filtriranje po imenu organizatora
-        organizer = self.request.GET.get('user')
-        if organizer:
-            queryset = queryset.filter(organizer__username__icontains=organizer)
-
-        # Pretraživanje po naslovu događaja
-        query = self.request.GET.get('q')
-        if query:
-            queryset = queryset.filter(title__icontains=query)
-
-        return queryset
-
-# Detalji događaja
-class EventDetailView(LoginRequiredMixin, DetailView):
-    model = Event
-    template_name = 'main/Event/event_detail.html'
-    context_object_name = 'event'
-    
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        # Dodavanje svih priloga povezanih s događajem u kontekst
-        context['attachments'] = self.object.attachments.all()
-        event = self.get_object()
-        user = self.request.user
-        
-        if user.is_authenticated:
-            context['is_participating'] = Participation.objects.filter(event=event, participant=user).exists()
-        else:
-            context['is_participating'] = False
-            
-        return context
 
 # Uređivanje događaja
 class EventUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
@@ -401,6 +354,7 @@ class EventUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
 
     def get_success_url(self):
         return reverse_lazy('main:event_detail', kwargs={'pk': self.object.pk})
+
 
 # Brisanje događaja
 class EventDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
@@ -447,13 +401,6 @@ def delete_comment(request, pk):
 
 
 # Participation
-
-from django.shortcuts import get_object_or_404
-from django.urls import reverse_lazy
-from django.contrib import messages
-from .models import Event, Participation
-
-
 class ParticipationCreateView(LoginRequiredMixin, CreateView):
     model = Participation
     fields = []
@@ -493,28 +440,19 @@ class AttachmentCreateView(LoginRequiredMixin, CreateView):
         return reverse_lazy('main:event_detail', kwargs={'pk': self.kwargs['event_pk']})
 
 
-# REST
+# REST API
 
 # Event
-
-from rest_framework.generics import ListCreateAPIView, RetrieveAPIView
-from rest_framework.permissions import IsAuthenticated, IsAdminUser
-from .models import *
-from .serializers import EventSerializer
-
-from django.contrib.auth.models import User
-from .serializers import UserSerializer
 
 class EventListCreateView(ListCreateAPIView):
     queryset = Event.objects.all()
     serializer_class = EventSerializer
     permission_classes = [IsAuthenticated] 
 
-class EventDetailView(RetrieveAPIView):
+class EventDetailViewAPI(RetrieveAPIView):
     queryset = Event.objects.all()
     serializer_class = EventSerializer
     permission_classes = [IsAuthenticated]
-
 
 # Users
 
@@ -524,7 +462,7 @@ class UserListCreateView(ListCreateAPIView):
     permission_classes = [IsAdminUser]
 
 
-class UserDetailView(RetrieveAPIView):
+class UserDetailViewAPI(RetrieveAPIView):
     queryset = CustomUser.objects.all()
     serializer_class = UserSerializer
     permission_classes = [IsAdminUser]

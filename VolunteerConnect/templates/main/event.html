@@ -4,11 +4,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Event</title>
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
-    <a href="{% url 'main:home' %}">Vrati se na početni zaslon</a>
-    <br><br>
-    <h1>Welcome to the Event Page!</h1>
-    <p>You have permission to view this page.</p>
+<body class="flex items-center justify-center min-h-screen bg-gray-100">
+    <div class="bg-white p-8 rounded-lg shadow-lg text-center max-w-lg">
+        <h1 class="text-3xl font-semibold text-gray-800">Welcome to the Event Page!</h1>
+        <p class="mt-4 text-gray-600">You have permission to view this page.</p>
+
+        <a href="{% url 'main:home' %}" 
+           class="mt-6 inline-block px-4 py-2 bg-blue-600 text-white rounded-lg shadow-md hover:bg-blue-700">
+            Vrati se na početni zaslon
+        </a>
+    </div>
 </body>
 </html>

@@ -1,19 +1,32 @@
-<a href="{% url 'main:home' %}">Vrati se na početni zaslon</a>
-<br><br>
-<h1>Popis Priloga</h1>
-<form method="get">
-    <input type="text" name="filename" placeholder="Naziv datoteke" value="{{ request.GET.filename }}">
-    <button type="submit">Filtriraj</button>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Popis Priloga</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="flex items-center justify-center min-h-screen bg-gray-100">
+    <div class="bg-white p-8 rounded-lg shadow-lg w-full max-w-lg">
+        <h1 class="text-2xl font-semibold text-gray-800 text-center">Popis Priloga</h1>
 
-    <br><br>
-
-    <input type="text" name="q" placeholder="Pretraži priloge ili događaje..." value="{{ request.GET.q }}">
-    <button type="submit">Pretraži</button>
-</form>
-<ul>
-    {% for attachment in attachments %}
-        <li><a href="{{ attachment.file.url }}">{{ attachment.file.name }}</a></li>
-    {% empty %}
-        <li>Nema priloga.</li>
-    {% endfor %}
-</ul>
+        <form method="get" class="mt-4 space-y-2">
+            <input type="text" name="filename" placeholder="Naziv datoteke" class="w-full p-2 border rounded">
+            <input type="text" name="q" placeholder="Pretraži priloge ili događaje..." class="w-full p-2 border rounded">
+            <button type="submit" class="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700">
+                Filtriraj
+            </button>
+        </form>
+        
+        <ul class="mt-6 space-y-2">
+            {% for attachment in attachments %}
+                <li>
+                    <a href="{{ attachment.file.url }}" class="text-blue-600 hover:underline">{{ attachment.file.name }}</a>
+                </li>
+            {% empty %}
+                <li class="text-gray-600">Nema priloga.</li>
+            {% endfor %}
+        </ul>
+    </div>
+</body>
+</html>

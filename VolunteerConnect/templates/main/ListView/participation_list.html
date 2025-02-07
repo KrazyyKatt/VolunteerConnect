@@ -1,22 +1,36 @@
-<a href="{% url 'main:home' %}">Vrati se na početni zaslon</a>
-<br><br>
-<h1>Popis Sudjelovanja</h1>
-<form method="get">
-    <!-- Filtriranje po korisnicima koji su organizatori -->
-    <input type="text" name="user" placeholder="Korisnik (organizator)" value="{{ request.GET.user }}">
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Popis Sudjelovanja</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="flex items-center justify-center min-h-screen bg-gray-100">
+    <div class="bg-white p-8 rounded-lg shadow-lg w-full max-w-lg">
+        <h1 class="text-2xl font-semibold text-gray-800 text-center">Popis Mojih Sudjelovanja</h1>
 
-    <!-- Pretraživanje po naslovu događaja -->
-    <input type="text" name="q" placeholder="Pretraži naslove događaja..." value="{{ request.GET.q }}">
 
-    <button type="submit">Primijeni</button>
-</form>
+        <ul class="mt-6 space-y-2">
+            {% for participation in participations %}
+                <li>
+                    <a href="{% url 'main:event_detail' participation.event.pk %}" class="text-blue-600 hover:underline">
+                        {{ participation.event.title }}
+                    </a>
+                    <p class="text-gray-600">Lokacija: {{ participation.event.location }}</p>
+                    <p class="text-gray-600">Datum: {{ participation.event.date }}</p>
+                </li>
+            {% empty %}
+                <li class="text-gray-600">Nema sudjelovanja.</li>
+            {% endfor %}
+        </ul>
 
-<hr>
+        <hr class="my-6">
 
-<ul>
-    {% for participation in participations %}
-        <li>{{ participation.participant.username }} - <a href="{% url 'main:event_detail' pk=participation.event.pk %}" >{{ participation.event.title }}</a></li>
-    {% empty %}
-        <li>Nema sudjelovanja.</li>
-    {% endfor %}
-</ul>
+        <div class="mt-6 flex justify-between">
+            <a href="{% url 'main:home' %}" class="text-blue-600 hover:underline">🏠 Početna</a>
+            <a href="{% url 'main:user_detail' user.id %}" class="text-blue-600 hover:underline">🔙 Povratak na profil</a>
+        </div>
+    </div>
+</body>
+</html>

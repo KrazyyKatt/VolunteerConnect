@@ -16,6 +16,7 @@ urlpatterns = [
 
     # Generički pogledi ListView
     path('events/', EventListView.as_view(), name='event_list'),
+    path('my_events/', MyEventListView.as_view(), name='my_event_list'),
     path('participations/', ParticipationListView.as_view(), name='participation_list'),
     path('comments/', CommentListView.as_view(), name='comment_list'),
     path('attachments/', AttachmentListView.as_view(), name='attachment_list'),
@@ -28,7 +29,7 @@ urlpatterns = [
     path('attachment/<int:pk>/', AttachmentDetailView.as_view(), name='attachment_detail'),
     path('user/<int:pk>/', UserDetailView.as_view(), name='user_detail'),
     
-    # Event
+    # Event 
     path('events/add/', EventCreateView.as_view(), name='event_add'),
     path('events/<int:pk>/', EventDetailView.as_view(), name='event_detail'),
     path('events/<int:pk>/edit/', EventUpdateView.as_view(), name='event_edit'),
@@ -49,11 +50,11 @@ urlpatterns = [
 
     # Events
     path('api/events/', EventListCreateView.as_view(), name='event_list_create'),
-    path('api/events/<int:pk>/', EventDetailView.as_view(), name='event_detail'),
+    path('api/events/<int:pk>/', EventDetailViewAPI.as_view(), name='api_event_detail'),
 
     # Users
     path('api/users/', UserListCreateView.as_view(), name='user_list_create'),
-    path('api/users/<int:pk>/', UserDetailView.as_view(), name='user_detail'),
+    path('api/users/<int:pk>/', UserDetailViewAPI.as_view(), name='api_user_detail'),
     
     
 ]

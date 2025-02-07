@@ -4,16 +4,27 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Prijava na događaj</title>
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
-    <h1>Prijava na događaj: {{ event.title }}</h1>
-    <form method="post">
-        {% csrf_token %}
-        <p>Želite li sudjelovati na ovom događaju?</p>
-        <button type="submit">Potvrdi</button>
-    </form>
-    <br>
-    <a href="{% url 'main:event_detail' event_pk %}">Povratak na događaj</a>
+<body class="flex items-center justify-center min-h-screen bg-gray-100">
+    <div class="bg-white p-8 rounded-lg shadow-lg w-full max-w-md text-center">
+        <h1 class="text-2xl font-semibold text-gray-800">Prijava na događaj</h1>
+        <p class="mt-4 text-gray-600 text-lg font-semibold">{{ event.title }}</p>
+
+        <form method="post" class="mt-6">
+            {% csrf_token %}
+            <p class="text-gray-600">Želite li sudjelovati na ovom događaju?</p>
+            <button type="submit" class="mt-4 px-6 py-2 bg-green-600 text-white rounded-lg shadow-md hover:bg-green-700">
+                ✅ Potvrdi sudjelovanje
+            </button>
+        </form>
+
+        <div class="mt-6">
+            <a href="{% url 'main:event_detail' event_pk %}" 
+               class="text-blue-600 hover:underline">
+                🔙 Povratak na događaj
+            </a>
+        </div>
+    </div>
 </body>
 </html>
-

@@ -1,19 +1,36 @@
-<a href="{% url 'main:home' %}">Vrati se na početni zaslon</a>
-<br><br>
-<h1>Popis Komentara</h1>
-<form method="get">
-    <input type="text" name="author" placeholder="Autor komentara" value="{{ request.GET.author }}">
-    <button type="submit">Filtriraj</button>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Popis Komentara</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="flex items-center justify-center min-h-screen bg-gray-100">
+    <div class="bg-white p-8 rounded-lg shadow-lg w-full max-w-lg">
+        <h1 class="text-2xl font-semibold text-gray-800 text-center">Popis Komentara</h1>
 
-    <br><br>
+        <form method="get" class="mt-4 space-y-2">
+            <input type="text" name="author" placeholder="Autor komentara" class="w-full p-2 border rounded">
+            <input type="text" name="q" placeholder="Pretraži komentare..." class="w-full p-2 border rounded">
+            <button type="submit" class="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700">
+                Filtriraj
+            </button>
+        </form>
 
-    <input type="text" name="q" placeholder="Pretraži komentare..." value="{{ request.GET.q }}">
-    <button type="submit">Pretraži</button>
-</form>
-<ul>
-    {% for comment in comments %}
-        <li>{{ comment.author.username }} - {{ comment.content }}</li>
-    {% empty %}
-        <li>Nema komentara.</li>
-    {% endfor %}
-</ul>
+        <ul class="mt-6 space-y-2">
+            {% for comment in comments %}
+                <li class="bg-gray-200 p-2 rounded">{{ comment.author.username }}: {{ comment.content }}</li>
+            {% empty %}
+                <li class="text-gray-600">Nema komentara.</li>
+            {% endfor %}
+        </ul>
+
+        <hr class="my-6">
+
+        <div class="mt-6 flex justify-between">
+            <a href="{% url 'main:home' %}" class="text-blue-600 hover:underline">🏠 Početna</a>
+        </div>
+    </div>
+</body>
+</html>

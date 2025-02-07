@@ -1,70 +1,98 @@
-<a href="{% url 'main:home' %}">Vrati se na početni zaslon</a>
-<br><br>
-{% load custom_filters %}
-<h1>{{ event.title }}</h1>
-<p>{{ event.description }}</p>
-<p>Lokacija: {{ event.location }}</p>
-<p>Datum: {{ event.date }}</p>
-<p>Organizator: {{ event.organizer.username }}</p>
-<a href="{% url 'main:event_edit' event.pk %}">Uredi</a>
-<a href="{% url 'main:event_delete' event.pk %}">Obriši</a>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ event.title }}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 min-h-screen flex items-center justify-center">
+    <div class="bg-white p-8 rounded-lg shadow-lg max-w-lg w-full">
+        <h1 class="text-2xl font-semibold text-gray-800 text-center">{{ event.title }}</h1>
+        <p class="mt-2 text-gray-600"><strong>Opis:</strong> {{ event.description }}</p>
+        <p class="text-gray-600"><strong>Lokacija:</strong> {{ event.location }}</p>
+        <p class="text-gray-600"><strong>Datum:</strong> {{ event.date }}</p>
+        <p class="text-gray-600"><strong>Organizator:</strong> {{ event.organizer.username }}</p>
 
-<hr>
+        <div class="mt-6 flex justify-between">
+            {% if user == event.organizer %}
+            <a href="{% url 'main:event_edit' event.pk %}" 
+               class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">Uredi</a>
+            <a href="{% url 'main:event_delete' event.pk %}" 
+               class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700">Obriši</a>
+               {% endif %}
+        </div>
 
+        <hr class="my-6">
 
-<!-- Prikaz slike -->
-<h2>Prilozi</h2>
-{% if attachments %}
-        {% for attachment in attachments %}
-                {% if attachment.file.url|is_image %}
-                    <!-- Prikaz slike -->
-                    <img src="{{ attachment.file.url }}" alt="Prilog" style="max-width: 300px; max-height: 300px;">
+        <!-- Prikaz priloga -->
+        {% load custom_filters %}
+        <h2 class="text-xl font-semibold text-gray-800">Prilozi</h2>
+        {% if attachments %}
+            <ul class="mt-2 space-y-2">
+                {% for attachment in attachments %}
+                    <li class="bg-gray-200 p-2 rounded">
+                        {% if attachment.file.url|is_image %}
+                            <img src="{{ attachment.file.url }}" alt="Prilog" class="max-w-full h-auto rounded">
+                        {% else %}
+                            <a href="{{ attachment.file.url }}" target="_blank" class="text-blue-600 hover:underline">
+                                {{ attachment.file.name }}
+                            </a>
+                        {% endif %}
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p class="text-gray-600">Nema priloga za ovaj događaj.</p>
+        {% endif %}
+
+        <hr class="my-6">
+
+        <!-- Sudjelovanje u eventu -->
+        {% if user.is_authenticated and user != event.organizer %}
+            <div class="mt-4 text-center">
+                {% if not is_participating %}
+                    <a href="{% url 'main:participate_in_event' event.pk %}" 
+                       class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">Sudjeluj</a>
                 {% else %}
-                    <!-- Prikaz poveznice za preuzimanje -->
-                    <a href="{{ attachment.file.url }}" target="_blank">
-                        {{ attachment.file.name }}
-                    </a>
+                    <p class="text-gray-600">Već sudjelujete na ovom događaju.</p>
+                    <br>
+                    <a href="{% url 'main:withdraw_from_event' event.pk %}" 
+                       class="mt-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700">Odustani od sudjelovanja</a>
                 {% endif %}
-        {% endfor %}
-{% else %}
-    <p>Nema priloga za ovaj događaj.</p>
-{% endif %}
+            </div>
+            <hr class="my-6">
+        {% endif %}
 
-<br>
-<hr>
-<br>
+        
 
-<!-- Sudjelovanje u eventu -->
-{% if user.is_authenticated and user != event.organizer %}
-    {% if not is_participating %}
-        <a href="{% url 'main:participate_in_event' event.pk %}" class="btn btn-primary">
-            Sudjeluj
+        <!-- Komentari -->
+        <h2 class="text-xl font-semibold text-gray-800">Komentari</h2>
+        <ul class="mt-2 space-y-2">
+            {% for comment in event.comments.all %}
+                <li class="bg-gray-200 p-2 rounded">
+                    {{ comment.author.username }}: {{ comment.content }}
+                    {% if user == comment.author %}
+                        <a href="{% url 'main:delete_comment' pk=comment.pk %}" 
+                           class="ml-2 text-red-600 hover:underline">Obriši</a>
+                    {% endif %}
+                </li>
+            {% empty %}
+                <li class="text-gray-600">Nema komentara.</li>
+            {% endfor %}
+        </ul>
+        <a href="{% url 'main:comment_add' event.pk %}" class="mt-4 inline-block text-blue-600 hover:underline">
+            Dodaj komentar
         </a>
-    {% else %}
-        <p>Već sudjelujete na ovom događaju.</p>
-        <a href="{% url 'main:withdraw_from_event' event.pk %}" class="btn btn-danger">
-            Odustani od sudjelovanja
-        </a>
-    {% endif %}
-{% endif %}
 
-<hr>
+        <hr class="my-6">
 
-<!-- Komentari -->
-<h3>Komentari</h3>
-<ul>
-    {% for comment in event.comments.all %}
-        <li>
-            {{ comment.author.username }}: {{ comment.content }}
-            {% if user == comment.author %}
-                <!-- Opcija za brisanje komentara -->
-                <a href="{% url 'main:delete_comment' pk=comment.pk %}" class="btn btn-danger btn-sm">
-                    Obriši
-                </a>
-            {% endif %}
-        </li>
-    {% empty %}
-        <li>Nema komentara.</li>
-    {% endfor %}
-</ul>
-<a href="{% url 'main:comment_add' event.pk %}">Dodaj komentar</a>
+        <div class="mt-6 flex justify-between">
+            <a href="{% url 'main:home' %}" class="text-blue-600 hover:underline">🏠 Početna</a>
+            <a href="{% url 'main:event_list' %}" class="text-blue-600 hover:underline">🔙 Povratak na događaje</a>
+        </div>
+    </div>
+
+    
+</body>
+</html>

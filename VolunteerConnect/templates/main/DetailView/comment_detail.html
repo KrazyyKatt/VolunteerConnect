@@ -4,22 +4,27 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Detalji Komentara</title>
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
-    <a href="{% url 'main:home' %}">Vrati se na početni zaslon</a>
-    <br><br>
-    <h1>Detalji Komentara</h1>
-    <p><strong>Autor:</strong> {{ comment.author.username }}</p>
-    <p><strong>Sadržaj:</strong> {{ comment.content }}</p>
-    <p><strong>Datum Kreiranja:</strong> {{ comment.created_at|date:"Y-m-d H:i" }}</p>
+<body class="flex items-center justify-center min-h-screen bg-gray-100">
+    <div class="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
+        <h1 class="text-2xl font-semibold text-gray-800 text-center">Detalji Komentara</h1>
+        <p class="mt-4 text-gray-600"><strong>Autor:</strong> {{ comment.author.username }}</p>
+        <p class="text-gray-600"><strong>Sadržaj:</strong> {{ comment.content }}</p>
 
-    <hr>
-    <!-- Povezani događaj -->
-    <h2>Povezani Događaj</h2>
-    <p><strong>Naslov:</strong> <a href="{% url 'main:event_detail' comment.event.pk %}">{{ comment.event.title }}</a></p>
-    <p><strong>Opis:</strong> {{ comment.event.description }}</p>
+        <hr class="my-4">
 
-    <hr>
-    <a href="{% url 'main:comment_list' %}">Povratak na popis komentara</a>
+        <h2 class="text-xl font-semibold text-gray-800">Povezani Događaj</h2>
+        <p><strong>Naslov:</strong> 
+            <a href="{% url 'main:event_detail' comment.event.pk %}" class="text-blue-600 hover:underline">
+                {{ comment.event.title }}
+            </a>
+        </p>
+
+        <div class="mt-6 flex justify-between">
+            <a href="{% url 'main:home' %}" class="text-blue-600 hover:underline">🏠 Početna</a>
+            <a href="{% url 'main:comment_list' %}" class="text-blue-600 hover:underline">🔙 Povratak na popis komentara</a>
+        </div>
+    </div>
 </body>
 </html>

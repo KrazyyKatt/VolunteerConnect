@@ -17,8 +17,15 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 
+from django.shortcuts import redirect
+
+def redirect_to_home(request):
+    return redirect('main:home')  # Namespace 'main' i ruta 'home'
+
+
 urlpatterns = [
     path('accounts/', include('django.contrib.auth.urls')),
-    path('', include('main.urls')),
+    path('', redirect_to_home, name='redirect_to_home'),  # Root URL preusmjerava na 'main:home'
+    path('', include('main.urls')),  # Inkluzija svih ruta iz aplikacije 'main'
     path('admin/', admin.site.urls),
 ]
